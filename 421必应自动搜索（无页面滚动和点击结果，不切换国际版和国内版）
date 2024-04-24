@@ -1,0 +1,109 @@
+// ==UserScript==
+// @name         421必应自动搜索（无页面滚动和点击结果，不切换国际版和国内版）
+// @namespace    http://tampermonkey.net/
+// @version      0.1
+// @description  自动在必应上搜索，不包括页面滚动和点击随机搜索结果，也不再切换国际版和本地版的必应。
+// @author       You
+// @match        *://*/*
+// @grant        none
+// ==/UserScript==
+
+(function() {
+    'use strict';
+
+    // 定义搜索关键词列表
+    var searchKeywords = [
+        "apple",
+        "banana",
+        "cat",
+        "dog",
+        "elephant",
+        "fish",
+        "grape",
+        "horse",
+        "ice cream",
+        "jellyfish",
+        "kiwi",
+        "lion",
+        "monkey",
+        "nest",
+        "orange",
+        "pineapple",
+        "queen",
+        "rabbit",
+        "strawberry",
+        "tiger",
+        "umbrella",
+        "vanilla",
+        "watermelon",
+        "xylophone",
+        "yak",
+        "zebra"
+    ];
+
+    // 中国各个省的天气
+    var chinaWeatherKeywords = [
+        "北京天气",
+        "上海天气",
+        "天津天气",
+        "重庆天气",
+        "河北天气",
+        "山西天气",
+        "辽宁天气",
+        "吉林天气",
+        "黑龙江天气",
+        "江苏天气",
+        "浙江天气",
+        "安徽天气",
+        "福建天气",
+        "江西天气",
+        "山东天气",
+        "河南天气",
+        "湖北天气",
+        "湖南天气",
+        "广东天气",
+        "海南天气",
+        "四川天气",
+        "贵州天气",
+        "云南天气",
+        "陕西天气",
+        "甘肃天气",
+        "青海天气",
+        "台湾天气",
+        "内蒙古天气",
+        "广西天气",
+        "西藏天气",
+        "宁夏天气",
+        "新疆天气",
+        "香港天气",
+        "澳门天气"
+    ];
+
+    // 随机选择一个搜索关键词
+    function getRandomKeyword() {
+        var allKeywords = searchKeywords.concat(chinaWeatherKeywords);
+        return allKeywords[Math.floor(Math.random() * allKeywords.length)];
+    }
+
+    // 随机选择一个间隔时间
+    function getRandomInterval() {
+        var minInterval = 6000; // 最小间隔为6秒
+        var maxInterval = 20000; // 最大间隔为20秒
+        return Math.floor(Math.random() * (maxInterval - minInterval + 1)) + minInterval;
+    }
+
+    // 定义搜索函数
+    function performSearch() {
+        // 获取随机关键词
+        var searchKeyword = getRandomKeyword();
+
+        // 在搜索框中输入关键词
+        document.getElementById("sb_form_q").value = searchKeyword;
+
+        // 模拟点击搜索按钮
+        document.getElementById("sb_form_go").click();
+    }
+
+    // 定时执行搜索
+    setInterval(performSearch, getRandomInterval());
+})();
