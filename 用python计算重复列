@@ -1,0 +1,42 @@
+#在python写代码。我有一个excel文件，放在D:\pycharm\0424excelall，名称为1，我需要修改他。这个excel有三个sheet，我需要修改sheet名称为“1”的内容，修改内容如下：1.检查B列从B2开始每个单元格内容在此列重复的次数，并把结果放在D列 2.检查B列从B2开始每个单元格内容是否在本列第一次出现，并把结果放在E列
+
+import openpyxl
+
+# 打开 Excel 文件
+file_path = r"D:\pycharm\0424excelall\1.xlsx"
+workbook = openpyxl.load_workbook(file_path)
+
+# 选择需要修改的 sheet
+sheet_name = "1"
+sheet = workbook[sheet_name]
+
+# 1. 检查B列从B2开始每个单元格内容在此列重复的次数，并把结果放在D列
+values_in_b_column = [cell.value for cell in sheet["B"][1:]]  # 从第二行开始取值
+count_dict = {}
+for value in values_in_b_column:
+    if value in count_dict:
+        count_dict[value] += 1
+    else:
+        count_dict[value] = 1
+
+# 将统计结果写入 D 列
+for index, value in enumerate(values_in_b_column, start=2):  # 从第二行开始写入
+    count = count_dict.get(value, 0)
+    sheet[f"D{index}"] = count
+
+# 2. 检查B列从B2开始每个单元格内容是否在本列第一次出现，并把结果放在E列
+first_occurrence_dict = {}
+for index, value in enumerate(values_in_b_column, start=2):
+    if value not in first_occurrence_dict:
+        first_occurrence_dict[value] = index
+
+# 将检查结果写入 E 列
+for index, value in enumerate(values_in_b_column, start=2):
+    first_occurrence_row = first_occurrence_dict[value]
+    if index == first_occurrence_row:
+        sheet[f"E{index}"] = "是"
+    else:
+        sheet[f"E{index}"] = "否"
+
+# 保存修改后的 Excel 文件
+workbook.save(file_path)
