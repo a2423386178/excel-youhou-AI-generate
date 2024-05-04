@@ -1,6 +1,7 @@
-# 0504.py 属于项目excel0426；
 import pandas as pd
 import os
+from datetime import datetime
+import time
 
 # 城市到汉语城市的映射字典
 city_to_chinese = {
@@ -62,8 +63,10 @@ city_to_country = {
     "Taipei": "中国台湾"
 }
 
+# 文件夹路径
+folder_path = r'C:\Users\0712\Downloads\Telegram Desktop'
+
 # 读取.csv文件并合并
-folder_path = "C:\\Users\\0712\\Downloads\\Telegram Desktop"
 csv_files = [os.path.join(folder_path, file) for file in os.listdir(folder_path) if file.endswith('.csv')]
 
 # 检查是否存在.csv文件
@@ -114,3 +117,41 @@ output_file_path = os.path.join(folder_path, "5.xlsx")
 df.to_excel(output_file_path, index=False)
 
 print("处理完成，并已保存为5.xlsx文件.")
+
+# 等待5秒
+time.sleep(5)
+
+# 找到文件名为5的xlsx文件
+target_file_5 = None
+for file in os.listdir(folder_path):
+    if file.endswith('.xlsx') and file.startswith('5'):
+        target_file_5 = file
+        break
+
+# 如果找到文件5.xlsx
+if target_file_5:
+    # 读取文件5.xlsx
+    df5 = pd.read_excel(os.path.join(folder_path, target_file_5))
+
+    # 获取IP地址、端口号、国家、汉语城市和数字
+    ip_address = df5['IP地址']
+    port = df5['端口']
+    country = df5['国家']
+    city = df5['汉语城市']
+    number = df5['数字']
+
+    # 创建一个新的DataFrame用于存储链接
+    df6 = pd.DataFrame(columns=['链接'])
+
+    # 根据每行的内容生成链接
+    for i in range(len(df5)):
+        link = f"vless://9b6e412d-4f71-4bb0-8231-e88e31147c99@{ip_address.iloc[i]}:{port.iloc[i]}?encryption=none&security=tls&sni=1.wer59.pp.ua&fp=randomized&type=ws&host=1.wer59.pp.ua&path=%2F%3Fed%3D2048#{country.iloc[i]}{city.iloc[i]}{number.iloc[i]}"
+        df6.loc[i] = link
+
+    # 保存处理后的文件6
+    current_time = datetime.now().strftime("%H%M%S")
+    new_filename = f"6_{current_time}.xlsx"
+    df6.to_excel(os.path.join(folder_path, new_filename), index=False)
+    print("处理后的文件已保存为:", new_filename)
+else:
+    print("未找到符合条件的文件")
