@@ -1,0 +1,116 @@
+# 0504.py 属于项目excel0426；
+import pandas as pd
+import os
+
+# 城市到汉语城市的映射字典
+city_to_chinese = {
+    "Hong Kong": "香港",
+    "Seoul": "首尔",
+    "Singapore": "新加坡",
+    "Tokyo": "东京",
+    "Seattle": "西雅图",
+    "Frankfurt": "法兰克福",
+    "Los Angeles": "洛杉矶",
+    "Chicago": "芝加哥",
+    "San Jose": "圣何塞",
+    "Toronto": "多伦多",
+    "Stockholm": "斯德哥尔摩",
+    "Warsaw": "华沙",
+    "Amsterdam": "阿姆斯特丹",
+    "Paris": "巴黎",
+    "Dublin": "都柏林",
+    "London": "伦敦",
+    "Milan": "米兰",
+    "Oslo": "奥斯陆",
+    "Tel Aviv": "特拉维夫",
+    "Osaka": "大阪",
+    "Ashburn": "阿什本",
+    "Sydney": "悉尼",
+    "Montréal": "蒙特利尔",
+    "Vancouver": "温哥华",
+    "Mumbai": "孟买",
+    "Taipei": "台北"
+}
+
+# 城市到国家的映射字典
+city_to_country = {
+    "Hong Kong": "中国",
+    "Seoul": "韩国",
+    "Singapore": "新加坡",
+    "Tokyo": "日本",
+    "Seattle": "美国",
+    "Frankfurt": "德国",
+    "Los Angeles": "美国",
+    "Chicago": "美国",
+    "San Jose": "美国",
+    "Toronto": "加拿大",
+    "Stockholm": "瑞典",
+    "Warsaw": "波兰",
+    "Amsterdam": "荷兰",
+    "Paris": "法国",
+    "Dublin": "爱尔兰",
+    "London": "英国",
+    "Milan": "意大利",
+    "Oslo": "挪威",
+    "Tel Aviv": "以色列",
+    "Osaka": "日本",
+    "Ashburn": "美国",
+    "Sydney": "澳大利亚",
+    "Montréal": "加拿大",
+    "Vancouver": "加拿大",
+    "Mumbai": "印度",
+    "Taipei": "中国台湾"
+}
+
+# 读取.csv文件并合并
+folder_path = "C:\\Users\\0712\\Downloads\\Telegram Desktop"
+csv_files = [os.path.join(folder_path, file) for file in os.listdir(folder_path) if file.endswith('.csv')]
+
+# 检查是否存在.csv文件
+if not csv_files:
+    print("文件夹中没有找到任何.csv文件.")
+    exit()
+
+dfs = []
+for file_path in csv_files:
+    try:
+        df = pd.read_csv(file_path)
+        dfs.append(df)
+    except FileNotFoundError:
+        print(f"文件 '{file_path}' 不存在.")
+
+if not dfs:
+    print("没有找到任何文件.")
+    exit()
+
+merged_df = pd.concat(dfs)
+
+# 将合并后的数据保存为4.xlsx
+output_file_path = os.path.join(folder_path, "4.xlsx")
+merged_df.to_excel(output_file_path, index=False)
+
+# 读取4.xlsx文件
+df = pd.read_excel(output_file_path)
+
+# 按下载速度排序并添加序号列
+df['下载速度'] = df['下载速度'].str.rstrip('kB/s').astype(float)
+df = df.sort_values(by='下载速度', ascending=False).reset_index(drop=True)
+df.insert(0, '数字', df.index + 1)
+
+# 城市英文翻译成汉语
+df['汉语城市'] = df['城市'].map(city_to_chinese)
+
+# 添加国家列
+df['国家'] = df['城市'].map(city_to_country)
+
+# 检查并删除重复的IP地址和端口号
+df.drop_duplicates(subset=['IP地址', '端口'], inplace=True)
+
+# 重新排序
+df = df.sort_values(by='数字').reset_index(drop=True)
+
+# 将处理后的结果保存为5.xlsx文件
+output_file_path = os.path.join(folder_path, "5.xlsx")
+df.to_excel(output_file_path, index=False)
+
+print("处理完成，并已保存为5.xlsx文件.")
